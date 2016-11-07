@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+  head
+    title Collaborative Drawing
+    link(href="http://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
+    script(src="/socket.io/socket.io.js") //served by socket.io
+  body
+    nav
+      .nav-wrapper
+        a(href='#!').brand-logo Collaborative Drawing!
+        ul.right.hide-on-med-and-down
+          li
+            a(href="sass.html") sass
+        ul.side-nav#mobile-demo
+          li
+            a(href='sass.html') Sass
+    .container
+      block content
