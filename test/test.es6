@@ -83,7 +83,7 @@ describe("Lens", () => {
 			var op = new OtherLens().multiplyBy(2).add(4);
 			var newPoint = op.apply(point);
 			var oldPoint = op.inverse().apply(newPoint);
-			expect(point).to.deep.equal(newPoint);
+			expect(point).to.deep.equal(oldPoint);
 		});
 	})
 });
