@@ -13035,9 +13035,9 @@
 
 	var _vue2 = _interopRequireDefault(_vue);
 
-	var _lens = __webpack_require__(37);
+	var _otherLens = __webpack_require__(37);
 
-	var _lens2 = _interopRequireDefault(_lens);
+	var _otherLens2 = _interopRequireDefault(_otherLens);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13049,6 +13049,9 @@
 	 */
 
 	//Imports
+	var L = new _otherLens2.default();
+	//import Lens from "./lens.es6";
+
 	var conn = new _serverInterface2.default();
 	var easel = new _easel2.default("myCanvas");
 	var events = new _eventSystem2.default(easel);
@@ -13071,7 +13074,9 @@
 	conn.onInitalDataRecived(function (ident, points) {
 		console.log('Recieved Identity', ident);
 		state.ident = ident;
-		state.lens = new _lens2.default(easel, ident.index, ident.zoom, false);
+		state.points = points;
+		state.lens = L.multiplyBy(ident.zoom).addX(ident.index % ident.zoom * easel.canvas.width * -1).addY(Math.floor(ident.index / ident.zoom) * easel.canvas.height * -1);
+
 		easel.drawPoints(points, state.lens);
 	});
 	conn.onPointRecived(function (point) {
@@ -13092,6 +13097,7 @@
 
 			point = state.lens.inverse().apply(point);
 			conn.sendPoint(point);
+			state.points.push(point);
 			easel.drawPoint(point, state.lens);
 		}
 	}
@@ -13102,7 +13108,14 @@
 		methods: {
 			setColor: function setColor(color) {
 				return state.color = color;
+			},
+			up: function up() {
+				return state.lens = state.lens.addY(-10);
+			},
+			down: function down() {
+				return state.lens = state.lens.addY(10);
 			}
+
 		}
 	});
 
@@ -37860,7 +37873,7 @@
 
 /***/ },
 /* 37 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -37870,81 +37883,116 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+	var _ramda = __webpack_require__(31);
+
+	var _ramda2 = _interopRequireDefault(_ramda);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	/**
-	 * @fileOverview Holds and exports the {@link Lens} class.
-	 * @author <a href="mailto:jstillerman2019@spyponders.com">Jason Stillerman</a>
-	 * @version 0.1
-	 */
+	var OtherLens = function () {
+		function OtherLens(operations, operation) {
+			_classCallCheck(this, OtherLens);
 
-	/** Class representing a Lens */
-	var Lens = function () {
-		/**
-	  * Makes a Lens
-	  * @param {Easel} easel - the easel that the lens will use for spacing
-	  * @param {int} index - which chunk of the easel to zoom in on
-	  * @param {float} zoom - how far in to zoom
-	  * @param {boolean} [invert=false] - idek
-	  */
-		function Lens(easel, index, zoom) {
-			var invert = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-
-			_classCallCheck(this, Lens);
-
-			this.invert = invert;
-			this.easel = easel;
-			this.index = index;
-			this.zoom = zoom;
-			this.x = index % zoom * (easel.canvas.width / zoom) * 2;
-			this.y = Math.floor(index / zoom) * (easel.canvas.height / zoom) * 2;
-			if (invert) {
-				this.zoom = 1 / this.zoom;
+			this.operations = operations || [];
+			if (operation) {
+				this.operations.push(operation);
 			}
 		}
-		/**
-	  * Applies transformation to given point
-	  * @param {point} point - the point
-	  * @returns {point} the transformed point
-	  */
 
-
-		_createClass(Lens, [{
-			key: "apply",
-			value: function apply(point) {
-				var zoomedPoint = JSON.parse(JSON.stringify(point));
-				if (this.invert) {
-					zoomedPoint.x += -this.x;
-					zoomedPoint.y += -this.y;
-				}
-				zoomedPoint.x *= this.zoom;
-				zoomedPoint.y *= this.zoom;
-				zoomedPoint.r *= this.zoom;
-
-				if (!this.invert) {
-					zoomedPoint.x += this.invert ? this.x : -this.x;
-					zoomedPoint.y += this.invert ? this.y : -this.y;
-				}
-				return zoomedPoint;
+		_createClass(OtherLens, [{
+			key: "add",
+			value: function add(number) {
+				return new OtherLens(this.operations, {
+					add: number
+				});
 			}
 		}, {
-			key: "empty",
-			value: function empty() {
-				return new Lens(this.easel, 0, 1);
+			key: "addX",
+			value: function addX(number) {
+				if (number == 0 || number == -0) return this;
+				return new OtherLens(this.operations, {
+					addX: number
+				});
+			}
+		}, {
+			key: "addY",
+			value: function addY(number) {
+				if (number == 0 || number == -0) return this;
+				return new OtherLens(this.operations, {
+					addY: number
+				});
+			}
+		}, {
+			key: "multiplyBy",
+			value: function multiplyBy(number) {
+				return new OtherLens(this.operations, {
+					multiplyBy: number
+				});
+			}
+		}, {
+			key: "apply",
+			value: function apply(point) {
+				var newPoint = JSON.parse(JSON.stringify(point)); //Copy without reference
+				for (var i = 0; i < this.operations.length; i++) {
+					if (this.operations[i].add) {
+						newPoint.x = newPoint.x + this.operations[i].add;
+						newPoint.y = newPoint.y + this.operations[i].add;
+						newPoint.r = newPoint.r + this.operations[i].add;
+					}
+					if (this.operations[i].multiplyBy) {
+						newPoint.x = newPoint.x * this.operations[i].multiplyBy;
+						newPoint.y = newPoint.y * this.operations[i].multiplyBy;
+						newPoint.r = newPoint.r * this.operations[i].multiplyBy;
+					}
+
+					if (this.operations[i].addX) {
+						newPoint.x = newPoint.x + this.operations[i].addX;
+					}
+
+					if (this.operations[i].addY) {
+						newPoint.y = newPoint.y + this.operations[i].addY;
+					}
+				}
+				return newPoint;
 			}
 		}, {
 			key: "inverse",
 			value: function inverse() {
-				var lens = new Lens(this.easel, this.index, this.zoom, true);
-				console.log(lens);
-				return lens;
+				//reverse the order of the operations
+				var ops = [].concat(this.operations).reverse();
+
+				//Make the operations the respective inverse
+				return new OtherLens(ops.map(function (op) {
+					if (op.add) {
+						return {
+							add: -op.add
+						};
+					}
+					if (op.multiplyBy) {
+						return {
+							multiplyBy: 1 / op.multiplyBy
+						};
+					}
+					if (op.addX) {
+						return {
+							addX: -op.addX
+						};
+					}
+					if (op.addY) {
+						return {
+							addY: -op.addY
+						};
+					}
+				}));
 			}
 		}]);
 
-		return Lens;
+		return OtherLens;
 	}();
 
-	exports.default = Lens;
+	exports.default = OtherLens;
 
 /***/ }
 /******/ ]);

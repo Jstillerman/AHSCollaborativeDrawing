@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha-webpack --webpack-config webpack.config-test.js \"test/test.es6\""
+    "test": "mocha-webpack --webpack-config test/webpack.config-test.js \"test/test.es6\"",
+	"docs": "jsdoc -c docs/conf.json.jsdoc -d ./docs"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "webpack": "^1.13.2"
   },
   "dependencies": {
+    "chai": "^3.5.0",
     "color-picker": "0.0.1",
     "emmiter": "0.0.4",
     "express": "^4.14.0",

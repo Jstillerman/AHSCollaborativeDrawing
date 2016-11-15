@@ -10,10 +10,11 @@ import R from 'ramda';
 import Connection from './server-interface.es6';
 import EventSystem from './event-system.es6';
 import Vue from "vue";
-import Lens from "./lens.es6";
-//import Lens from "./other-lens.es6";
+//import Lens from "./lens.es6";
+import Lens from "./other-lens.es6";
 
 //Initialize vars
+var L = new Lens();
 var conn = new Connection();
 var easel = new Easel("myCanvas");
 var events = new EventSystem(easel);
@@ -32,7 +33,11 @@ events.register("mousemove", handleMovement);
 conn.onInitalDataRecived((ident, points) => {
 	console.log('Recieved Identity', ident);
 	state.ident = ident;
-	state.lens = new Lens(easel, ident.index, ident.zoom, false);
+	state.points = points;
+	state.lens = L.multiplyBy(ident.zoom)
+		.addX(ident.index % ident.zoom * easel.canvas.width * -1)
+		.addY(Math.floor(ident.index / ident.zoom) * easel.canvas.height * -1);
+
 	easel.drawPoints(points, state.lens);
 });
 conn.onPointRecived((point) => easel.drawPoint(point, state.lens));
@@ -50,6 +55,7 @@ function handleMovement(evt) {
 
 		point = state.lens.inverse().apply(point);
 		conn.sendPoint(point);
+		state.points.push(point);
 		easel.drawPoint(point, state.lens);
 	}
 }
@@ -58,6 +64,9 @@ var vm = new Vue({
 	el: '#myApp',
 	data: state,
 	methods: {
-		setColor: (color) => state.color = color
+		setColor: (color) => state.color = color,
+		up: () => state.lens = state.lens.addY(-10),
+		down: () => state.lens = state.lens.addY(10)
+
 	}
 });
