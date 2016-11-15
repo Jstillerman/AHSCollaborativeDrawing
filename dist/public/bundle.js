@@ -13035,9 +13035,9 @@
 
 	var _vue2 = _interopRequireDefault(_vue);
 
-	var _otherLens = __webpack_require__(37);
+	var _lens = __webpack_require__(38);
 
-	var _otherLens2 = _interopRequireDefault(_otherLens);
+	var _lens2 = _interopRequireDefault(_lens);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13049,9 +13049,7 @@
 	 */
 
 	//Imports
-	var L = new _otherLens2.default();
-	//import Lens from "./lens.es6";
-
+	var L = new _lens2.default();
 	var conn = new _serverInterface2.default();
 	var easel = new _easel2.default("myCanvas");
 	var events = new _eventSystem2.default(easel);
@@ -37872,7 +37870,8 @@
 
 
 /***/ },
-/* 37 */
+/* 37 */,
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -37881,7 +37880,11 @@
 		value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @fileOverview Holds and exports the {@link Lens} class.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @author <a href="mailto:jstillerman2019@spyponders.com">Jason Stillerman</a>
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @version 0.1
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
 	var _ramda = __webpack_require__(31);
 
@@ -37891,7 +37894,13 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	/** Class representing a Lens */
 	var OtherLens = function () {
+		/**
+	  * Creates a new lens
+	  * @param {operation[]} [operations] - A list of objects that describe functions to transform a number (immutable)
+	  * @param {operation} [operation] - An object that describes what kind of transformation function to use
+	  */
 		function OtherLens(operations, operation) {
 			_classCallCheck(this, OtherLens);
 
@@ -37908,6 +37917,13 @@
 					add: number
 				});
 			}
+
+			/**
+	   * Returns a new Lens that is identical to this but adds a number to the x value at the end of the process
+	   * @param {number} number - The number to add to x
+	   * @returns {Lens}
+	   */
+
 		}, {
 			key: "addX",
 			value: function addX(number) {
@@ -37916,6 +37932,13 @@
 					addX: number
 				});
 			}
+
+			/**
+	   * Returns a new Lens that is identical to this but adds a number to the y value at the end of the process
+	   * @param {number} number - The number to add to y
+	   * @returns {Lens}
+	   */
+
 		}, {
 			key: "addY",
 			value: function addY(number) {
@@ -37924,6 +37947,12 @@
 					addY: number
 				});
 			}
+			/**
+	   * Returns a new Lens that is identical to this but multiplies x, y, and r at the end of the process
+	   * @param {number} number - The number to multiply x, y, and r by
+	   * @returns {Lens}
+	   */
+
 		}, {
 			key: "multiplyBy",
 			value: function multiplyBy(number) {
@@ -37931,6 +37960,13 @@
 					multiplyBy: number
 				});
 			}
+
+			/**
+	   * Transforms a point object using each operation in order of definition
+	   * @param {Point} point - the point (in global coordinates) you wish to transform
+	   * @returns {Point} - The point after undergoing the transformation
+	   */
+
 		}, {
 			key: "apply",
 			value: function apply(point) {
@@ -37957,6 +37993,11 @@
 				}
 				return newPoint;
 			}
+			/**
+	   * Returns a new Lens that would undo the operation of this
+	   * @returns {Lens}
+	   */
+
 		}, {
 			key: "inverse",
 			value: function inverse() {
@@ -37986,6 +38027,16 @@
 						};
 					}
 				}));
+			}
+
+			/**
+	   * A getter for inverse so you can do L.inverse.apply(...) instead of L.inverse().apply(...)
+	   */
+
+		}, {
+			key: "inv",
+			get: function get() {
+				return this.inverse();
 			}
 		}]);
 

@@ -10,8 +10,7 @@ import R from 'ramda';
 import Connection from './server-interface.es6';
 import EventSystem from './event-system.es6';
 import Vue from "vue";
-//import Lens from "./lens.es6";
-import Lens from "./other-lens.es6";
+import Lens from "./lens.es6";
 
 //Initialize vars
 var L = new Lens();
