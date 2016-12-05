@@ -1,0 +1,40 @@
+extends ../layout.pug
+
+block content
+  .row
+    .col.s8
+      .card-panel.hoverable
+        canvas#myCanvas
+    .col.s4#controls
+      .card-panel.hoverable Controls
+        br
+        a.waves-effect.waves-teal.btn-flat.center-align(@click="adjust(10, 0)") Left
+        br
+        a.waves-effect.waves-teal.btn-flat.center-align(@click="adjust(-10, 0)") Right
+        br
+        a.waves-effect.waves-teal.btn-flat.center-align(@click="adjust(0, 10)") Up
+        br
+        a.waves-effect.waves-teal.btn-flat.center-align(@click="adjust(0, -10)") Down
+        br
+        p(class="range-field")
+          input(type="range", min="1", max="15", step="0.5" v-model:value="size")
+      .card-panel.hoverable
+        a.waves-effect.waves-teel.btn-flat.center-align(@click="clear") Clear
+        a.waves-effect.waves-teel.btn-flat.center-align(@click="view") View
+      .row
+      div(style="bottom: 45px; right: 24px", id="myApp").fixed-action-btn.horizontal.click-to-toggle
+        a.btn-floating.btn-large.red
+          i.material-icons edit
+        ul
+          li
+            a.btn-floating.blue
+              i.material-icons(@click="setColor('blue')") edit
+          li
+            a.btn-floating.yellow(@click="setColor('yellow')")
+              i.material-icons edit
+          li
+            a.btn-floating.red(@click="setColor('red')")
+              i.material-icons edit
+          li
+            a.btn-floating.green(@click="setColor('green')")
+              i.material-icons edit

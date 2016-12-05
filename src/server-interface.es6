@@ -18,11 +18,14 @@ import io from './socket.io.js';
  * Class that represents a connection to the server. This is responsible for bridging the gap between client/server
  */
 class Connection {
-
-	constructor() {
+	/**
+	 * Makes a new Connection
+	 * @param {Boolean} [assignId=true] - Whether or not the server should assign an id
+	 */
+	constructor(assignId = true) {
 			this.socket = io.connect();
 			console.log("Initialized Connection");
-
+			this.socket.emit("here", assignId);
 		}
 		/**
 		 * Registers a callback to handle the inital data sent from the server

@@ -51,10 +51,6 @@
 
 	__webpack_require__(29);
 
-	Materialize.toast("hi", 2000);
-
-	console.log("hello");
-
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
@@ -13029,52 +13025,38 @@
 
 	var _serverInterface2 = _interopRequireDefault(_serverInterface);
 
-	var _eventSystem = __webpack_require__(35);
-
-	var _eventSystem2 = _interopRequireDefault(_eventSystem);
-
-	var _vue = __webpack_require__(36);
+	var _vue = __webpack_require__(35);
 
 	var _vue2 = _interopRequireDefault(_vue);
 
-	var _lens = __webpack_require__(37);
+	var _lens = __webpack_require__(36);
 
 	var _lens2 = _interopRequireDefault(_lens);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	//Initialize vars
-	/**
-	 * @fileOverview This connects all of the components for the client.
-	 * @author <a href="mailto:jstillerman2019@spyponders.com">Jason Stillerman</a>
-	 * @version 0.1
-	 */
+	console.log("suhdude");
 
-	//Imports
+	console.log("I am the viewer");
+
+	//Initialize vars
 	var L = new _lens2.default();
-	var conn = new _serverInterface2.default();
+	var conn = new _serverInterface2.default(false);
 	var easel = new _easel2.default("myCanvas");
-	var events = new _eventSystem2.default(easel);
 	var state = {
 		mousedown: false,
 		points: [],
 		color: "red",
-		size: 20
+		ident: {
+			zoom: 1,
+			index: 0
+		}
 	};
-
-	//Register mouse events
-	events.register("mousedown", function () {
-		return state.mousedown = true;
-	});
-	events.register("mouseup", function () {
-		return state.mousedown = false;
-	});
-	events.register("mousemove", handleMovement);
 
 	//Register connection callbacks
 	conn.onInitalDataRecived(function (ident, points) {
 		console.log('Recieved Identity', ident);
-		state.ident = ident;
+		var ident = state.ident;
 		state.points = points;
 		state.lens = L.multiplyBy(ident.zoom).addX(ident.index % ident.zoom * easel.canvas.width * -1).addY(Math.floor(ident.index / ident.zoom) * easel.canvas.height * -1);
 
@@ -13090,48 +13072,10 @@
 		return easel.clear();
 	});
 
-	function handleMovement(evt) {
-		if (state.mousedown) {
-			var point = {
-				x: evt.x,
-				y: evt.y,
-				r: state.size,
-				color: state.color
-			};
-
-			point = state.lens.inverse().apply(point);
-			conn.sendPoint(point);
-			state.points.push(point);
-			easel.drawPoint(point, state.lens);
-		}
-	}
-
 	function redraw() {
 		easel.clear();
 		easel.drawPoints(state.points, state.lens);
 	}
-	// Vue initialization
-	var vm = new _vue2.default({
-		el: '#controls',
-		data: state,
-		methods: {
-			setColor: function setColor(color) {
-				return state.color = color;
-			},
-			adjust: function adjust(x, y) {
-				state.lens = state.lens.addX(x);
-				state.lens = state.lens.addY(y);
-				redraw();
-			},
-			clear: function clear() {
-				return window.location = "/clear";
-			},
-			view: function view() {
-				return window.location = "/view";
-			}
-
-		}
-	});
 
 /***/ },
 /* 30 */
@@ -30315,64 +30259,6 @@
 
 /***/ },
 /* 35 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * @fileOverview Manages user input. Exposes {@link EventSystem} class.
-	 * @author <a href="mailto:jstillerman2019@spyponders.com">Jason Stillerman</a>
-	 * @version 0.1
-	 */
-
-	/** A class that handles input from user */
-	var EventSystem = function () {
-		/**
-	  * @constructor
-	  * @param {Easel} easel - This is the easel that the eventlistener listens to
-	  * @param {Boolean} [debug = false] - When this is true the events will be logged
-	  */
-		function EventSystem(easel) {
-			var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-			_classCallCheck(this, EventSystem);
-
-			this.canvas = easel.canvas;
-			this.debug = debug;
-		}
-
-		_createClass(EventSystem, [{
-			key: "register",
-			value: function register(event, cb) {
-				var _this = this;
-
-				this.canvas.addEventListener(event, function (evt) {
-					if (_this.debug) console.log(event, evt);
-					var x = evt.clientX - _this.canvas.offsetLeft + document.body.scrollLeft;
-					var y = evt.clientY - _this.canvas.offsetTop + document.body.scrollTop;
-					cb({
-						x: x,
-						y: y
-					});
-				});
-			}
-		}]);
-
-		return EventSystem;
-	}();
-
-	exports.default = EventSystem;
-
-/***/ },
-/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*!
@@ -37893,7 +37779,7 @@
 
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

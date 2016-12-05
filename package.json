@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha-webpack --webpack-config test/webpack.config-test.js \"test/test.es6\"",
-	"docs": "jsdoc -c docs/conf.json.jsdoc -d ./docs; open docs/index.html"
+    "docs": "jsdoc -c docs/conf.json.jsdoc -d ./docs; open docs/index.html"
   },
   "repository": {
     "type": "git",
@@ -38,8 +38,11 @@
     "color-picker": "0.0.1",
     "emmiter": "0.0.4",
     "express": "^4.14.0",
+    "express-session": "^1.14.2",
     "jquery": "^3.1.1",
     "materialize-css": "^0.97.7",
+    "passport": "^0.3.2",
+    "passport-google-oauth": "^1.0.0",
     "ramda": "^0.22.1",
     "socket.io": "^1.5.0",
     "vue": "^2.0.3",

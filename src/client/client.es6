@@ -5,12 +5,12 @@
  */
 
 //Imports
-import Easel from './easel.es6';
+import Easel from '../easel.es6';
 import R from 'ramda';
-import Connection from './server-interface.es6';
-import EventSystem from './event-system.es6';
+import Connection from '../server-interface.es6';
+import EventSystem from '../event-system.es6';
 import Vue from "vue";
-import Lens from "./lens.es6";
+import Lens from "../lens.es6";
 
 //Initialize vars
 var L = new Lens();
@@ -19,8 +19,9 @@ var easel = new Easel("myCanvas");
 var events = new EventSystem(easel);
 var state = {
 	mousedown: false,
-	lines: [],
-	color: "red"
+	points: [],
+	color: "red",
+	size: 20
 }
 
 //Register mouse events
@@ -40,6 +41,7 @@ conn.onInitalDataRecived((ident, points) => {
 	easel.drawPoints(points, state.lens);
 });
 conn.onPointRecived((point) => easel.drawPoint(point, state.lens));
+conn.onPointRecived((point) => state.points.push(point));
 conn.onDeleteRecived(() => easel.clear());
 
 
@@ -48,7 +50,7 @@ function handleMovement(evt) {
 		var point = {
 			x: evt.x,
 			y: evt.y,
-			r: 10,
+			r: state.size,
 			color: state.color
 		}
 
@@ -58,14 +60,24 @@ function handleMovement(evt) {
 		easel.drawPoint(point, state.lens);
 	}
 }
+
+function redraw() {
+	easel.clear();
+	easel.drawPoints(state.points, state.lens);
+}
 // Vue initialization
 var vm = new Vue({
-	el: '#myApp',
+	el: '#controls',
 	data: state,
 	methods: {
 		setColor: (color) => state.color = color,
-		up: () => state.lens = state.lens.addY(-10),
-		down: () => state.lens = state.lens.addY(10)
+		adjust: (x, y) => {
+			state.lens = state.lens.addX(x);
+			state.lens = state.lens.addY(y);
+			redraw();
+		},
+		clear: () => window.location = "/clear",
+		view: () => window.location = "/view"
 
 	}
 });
